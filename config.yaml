@@ -1,0 +1,12 @@
+---
+redirection_dialing_timeout: 120
+# PagerDuty API details. It's recommended to make a read-only API key.
+pagerduty_api_token: xxxxxxxxxxxxxxx
+pagerduty_api_base_url: https://YOURCOMPANY.pagerduty.com/api/v1
+pagerduty_schedules:
+- xxxxxxxx 
+# An AWS account for writing TwiML into S3. It's recommended to use IAM to
+# create an account locked down to just this bucket.
+aws_access_key_id:  xxxxxxxxxxxx
+aws_secret_access_key: xxxxxxxxxxxxxxx
+s3_bucket: mybucket.name.domain.com
