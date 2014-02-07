@@ -21,7 +21,7 @@ def pd_api_call(method, params = {})
   return JSON.load(RestClient.get(CONFIG['pagerduty_api_base_url']+method, args))
 end
 
-def publish_call_redirection_for(schedule_id)
+def who_is_oncall_for(schedule_id)
   # Search for users on-call in the next 5 minutes, to handle an incoming call.
   _since = DateTime.now.iso8601
   _until = 5.minutes.from_now.iso8601
@@ -31,12 +31,23 @@ def publish_call_redirection_for(schedule_id)
   # Get that on-call users' PagerDuty user ID and find their first listed phone
   # number.
   on_call_user_id = schedule["users"].first["id"]
+  on_call_user_id
+end
+
+def primary_phone_number_for(user_id)
   on_call_user_contact_methods = pd_api_call("/users/#{on_call_user_id}/contact_methods")["contact_methods"]
   phone_numbers = on_call_user_contact_methods.select { |method| method["type"] == "phone" }
   raise Exception.new("There are no phone numbers for user #{on_call_user_id} while searching schedule #{schedule_id}!") unless (phone_numbers.length > 0)
-  first_listed_phone_number = phone_numbers.first
-  country_code = first_listed_phone_number["country_code"]
-  phone_number = first_listed_phone_number["phone_number"]
+  primary_phone_number = phone_numbers.first
+  primary_phone_number
+end
+
+def publish_call_redirection_for(schedule_id)
+  on_call_user_id = who_is_oncall_for(schedule_id)
+  primary_phone_number = primary_phone_number_for(user_id)
+
+  country_code = primary_phone_number["country_code"]
+  phone_number = primary_phone_number["phone_number"]
 
   # Template a Twilio TwiML document to redirect the call.
   twiml = <<-EOF
@@ -46,9 +57,6 @@ def publish_call_redirection_for(schedule_id)
   <Dial timeout="#{CONFIG['redirection_dialing_timeout']}">+#{country_code}#{phone_number}</Dial>
 </Response>
   EOF
-
-  puts twiml
-  return
 
   # Upload the file to S3.
   service = S3::Service.new(:access_key_id => CONFIG['aws_access_key_id'], :secret_access_key => CONFIG['aws_secret_access_key'])
