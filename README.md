@@ -20,5 +20,5 @@ Usage
     * Pagerduty schedule IDs to generate TwiML for
     * AWS account keys
     * S3 bucket name
-* Call "bundle exec oncall.rb" from cron periodically.
+* Call "bundle exec ./oncall.rb" from cron periodically.
 * Setup inbound phone numbers in Twilio and point them at the new TwiML files in the S3 bucket.
