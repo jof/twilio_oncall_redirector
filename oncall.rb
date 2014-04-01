@@ -35,16 +35,16 @@ def who_is_oncall_for(schedule_id)
 end
 
 def primary_phone_number_for(user_id)
-  on_call_user_contact_methods = pd_api_call("/users/#{on_call_user_id}/contact_methods")["contact_methods"]
+  on_call_user_contact_methods = pd_api_call("/users/#{user_id}/contact_methods")["contact_methods"]
   phone_numbers = on_call_user_contact_methods.select { |method| method["type"] == "phone" }
-  raise Exception.new("There are no phone numbers for user #{on_call_user_id} while searching schedule #{schedule_id}!") unless (phone_numbers.length > 0)
+  raise Exception.new("There are no phone numbers for user #{user_id} while searching schedule #{schedule_id}!") unless (phone_numbers.length > 0)
   primary_phone_number = phone_numbers.first
   primary_phone_number
 end
 
 def publish_call_redirection_for(schedule_id)
   on_call_user_id = who_is_oncall_for(schedule_id)
-  primary_phone_number = primary_phone_number_for(user_id)
+  primary_phone_number = primary_phone_number_for(on_call_user_id)
 
   country_code = primary_phone_number["country_code"]
   phone_number = primary_phone_number["phone_number"]
