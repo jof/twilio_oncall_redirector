@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'sinatra'
-gem 'active_support'
+gem 'activesupport'
 gem 'json'
 gem 'rest-client'
 gem 's3'
