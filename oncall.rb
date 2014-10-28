@@ -64,6 +64,7 @@ def publish_call_redirection_for(schedule_id)
   raise Exception.new("S3 bucket #{CONFIG['s3_bucket']} not found!") unless bucket
   object = bucket.objects.build("rotation/#{schedule_id}.xml")
   object.content = twiml
+  object.content_type = 'text/xml'
   object.save
 end
 
